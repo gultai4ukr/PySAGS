@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from collections import deque
 
 
@@ -20,8 +21,8 @@ class Connection(object):
 
 class AbstractNode(object):
 
-    def __init__(self):
-        self.data = {}
+    def __init__(self, keys):
+        self.data = OrderedDict.fromkeys(keys, 0)
         self.connections = {}
 
     def add_connection(self, conn, key):
@@ -46,7 +47,7 @@ class DataStream(object):
         self.key = key
         self.connection = None
 
-    def add_connection(self, conn):
+    def add_connection(self, conn, key=None):
         self.connection = conn
 
     def send(self):
@@ -55,15 +56,15 @@ class DataStream(object):
 
 class SystolicArray(object):
 
-    def __init__(self, size, nodes_by_class, input_streams, connections):
+    def __init__(self, size, keys, nodes_by_class, input_streams, connections):
         self.current_step = 0
         self.n, self.m = size
         self.array = [[None] * self.m for _ in range(self.n)]
-        for node_cls, positions in nodes_by_class:
+        for node_cls, positions in nodes_by_class.items():
             for rows, cols in positions:
                 for r in self.fix_sequence_of_indexes(rows):
                     for c in self.fix_sequence_of_indexes(cols):
-                        self.array[r][c] = node_cls()
+                        self.array[r][c] = node_cls(keys)
         for i in range(self.n):
             assert None not in self.array[i]
         self.input_streams = input_streams
@@ -73,7 +74,7 @@ class SystolicArray(object):
             assert len(objs_from) == len(objs_to)
             for obj_from, objs_to in zip(objs_from, objs_to):
                 conn = Connection(obj_from, objs_to, key_from, key_to)
-                obj_from.add_connection(conn)
+                obj_from.add_connection(conn, key_from)
 
     @staticmethod
     def fix_sequence_of_indexes(seq):

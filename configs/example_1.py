@@ -8,6 +8,7 @@ class Node(AbstractNode):
 
 
 ARRAY_SIZE = (1, 3)
+KEYS = ['a', 'b', 'c']
 NODES_BY_CLASS = {
     Node: [(0, range(0, 3))],
 }
