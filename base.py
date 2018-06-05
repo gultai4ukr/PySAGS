@@ -14,9 +14,9 @@ class Connection(object):
     def send(self):
         self.obj_to.receive(self.data, self.key_to)
 
-    def receive(self, data):
+    def receive(self, data, key):
+        assert key == self.key_from
         self.data = data
-        self.send()
 
 
 class AbstractNode(object):
@@ -51,7 +51,7 @@ class DataStream(object):
         self.connection = conn
 
     def send(self):
-        self.connection.receive(self.queue.popleft() if len(self.queue) else 0)
+        self.connection.receive(self.queue.popleft() if len(self.queue) else 0, self.key)
 
 
 class SystolicArray(object):
@@ -68,6 +68,7 @@ class SystolicArray(object):
         for i in range(self.n):
             assert None not in self.array[i]
         self.input_streams = input_streams
+        self.connections = []
         for objs_from, objs_to, key_from, key_to in connections:
             objs_from = self.get_elements_sequence(objs_from)
             objs_to = self.get_elements_sequence(objs_to)
@@ -75,6 +76,7 @@ class SystolicArray(object):
             for obj_from, objs_to in zip(objs_from, objs_to):
                 conn = Connection(obj_from, objs_to, key_from, key_to)
                 obj_from.add_connection(conn, key_from)
+                self.connections.append(conn)
 
     @staticmethod
     def fix_sequence_of_indexes(seq):
@@ -106,13 +108,20 @@ class SystolicArray(object):
 
     def iterate(self, n_times=1):
         for _ in range(n_times):
-            for streams in self.input_streams:
+            for key, streams in self.input_streams.items():
                 if isinstance(streams, DataStream):
                     streams = [streams]
-                assert isinstance(streams, list)
+                assert isinstance(streams, list), \
+                    "Expected `list`, but got `{obj}` of `{type}` type".format(
+                        obj=streams, type=type(streams)
+                    )
                 for stream in streams:
                     stream.send()
             for r in range(self.n):
                 for c in range(self.m):
                     self.array[r][c].send()
+            for conn in self.connections:
+                conn.send()
+            for r in range(self.n):
+                for c in range(self.m):
                     self.array[r][c].process()

@@ -14,8 +14,8 @@ class Application(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        self.label_select_node_to_show = tk.Label(self, text="Select node to show")
-        self.label_select_node_to_show.place(x=20, y=20)
+        self.label_select_node = tk.Label(self, text="Select node to show")
+        self.label_select_node.place(x=20, y=20)
 
         self.label_x = tk.Label(self, text="X=")
         self.label_x.place(x=20, y=40)
@@ -27,10 +27,18 @@ class Application(tk.Frame):
         self.entry_y = tk.Entry(self, width=6)
         self.entry_y.place(x=40, y=60)
 
-        self.button_show_node = tk.Button(self, text="Show", command=self.show_node)
-        self.button_show_node.place(x=20, y=80)
+        self.label_steps = tk.Label(self, text="Specify number of steps")
+        self.label_steps.place(x=20, y=80)
 
-    def show_node(self):
+        self.entry_steps = tk.Entry(self, width=6)
+        self.entry_steps.place(x=20, y=100)
+
+        self.button_simulate = tk.Button(self, text="Simulate", command=self.simulate)
+        self.button_simulate.place(x=20, y=120)
+
+    def simulate(self):
+        steps = self.entry_steps.get()
+        self.systolic_array.iterate(int(steps) if steps else 1)
         r = int(self.entry_x.get())
         c = int(self.entry_y.get())
         for node in self.visible_nodes:
