@@ -30,16 +30,23 @@ class Application(tk.Frame):
         self.label_steps = tk.Label(self, text="Select step")
         self.label_steps.place(x=20, y=80)
 
-        self.entry_steps = tk.Entry(self, width=6)
-        self.entry_steps.place(x=20, y=100)
+        self.button_step_backward = tk.Button(self, text="-1", command=self.step_backward)
+        self.button_step_backward.place(x=20, y=100, width=25, height=20)
+
+        self.step = tk.IntVar()
+        self.entry_step = tk.Entry(self, width=6, textvariable=self.step)
+        self.entry_step.place(x=46, y=100)
+
+        self.button_step_forward = tk.Button(self, text="+1", command=self.step_forward)
+        self.button_step_forward.place(x=100, y=100, width=25, height=20)
 
         self.button_simulate = tk.Button(self, text="Simulate", command=self.simulate)
-        self.button_simulate.place(x=20, y=120)
+        self.button_simulate.place(x=20, y=120, width=105)
 
     def simulate(self):
-        steps = self.entry_steps.get()
-        self.systolic_array.reset()
-        self.systolic_array.iterate(int(steps))
+        if self.step.get() < self.systolic_array.current_step:
+            self.systolic_array.reset()
+        self.systolic_array.iterate(self.step.get() - self.systolic_array.current_step)
 
         r = int(self.entry_x.get())
         c = int(self.entry_y.get())
@@ -71,6 +78,14 @@ class Application(tk.Frame):
                 label = tk.Label(frame, text="{}={}".format(k, v))
                 label.pack()  # place(x=0, y=i*20)
             # todo: add arrows on connections
+
+    def step_forward(self):
+        self.step.set(self.step.get() + 1)
+        self.simulate()
+
+    def step_backward(self):
+        self.step.set(max(0, self.step.get() - 1))
+        self.simulate()
 
 
 if __name__ == '__main__':
