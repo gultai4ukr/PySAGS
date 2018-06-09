@@ -1,5 +1,4 @@
-from collections import OrderedDict
-from collections import deque
+from collections import deque, OrderedDict
 
 
 class Connection(object):
@@ -21,11 +20,14 @@ class Connection(object):
 
 class AbstractNode(object):
 
-    def __init__(self, keys):
-        self.data = OrderedDict.fromkeys(keys, 0)
+    KEYS = []
+
+    def __init__(self):
+        self.data = OrderedDict.fromkeys(self.KEYS, 0)
         self.connections = {}
 
     def add_connection(self, conn, key):
+        assert key in self.KEYS
         self.connections[key] = conn
 
     def send(self):
@@ -33,6 +35,7 @@ class AbstractNode(object):
             conn.receive(self.data.get(key, 0), key)
 
     def receive(self, data, key):
+        assert key in self.KEYS
         self.data[key] = data
 
     def process(self):
@@ -56,7 +59,7 @@ class DataStream(object):
 
 class SystolicArray(object):
 
-    def __init__(self, size, keys, nodes_by_class, input_streams, connections):
+    def __init__(self, size, nodes_by_class, input_streams, connections):
         self.current_step = 0
         self.n, self.m = size
         self.array = [[None] * self.m for _ in range(self.n)]
@@ -64,7 +67,7 @@ class SystolicArray(object):
             for rows, cols in positions:
                 for r in self.fix_sequence_of_indexes(rows):
                     for c in self.fix_sequence_of_indexes(cols):
-                        self.array[r][c] = node_cls(keys)
+                        self.array[r][c] = node_cls()
         for i in range(self.n):
             assert None not in self.array[i]
         self.input_streams = input_streams
@@ -86,8 +89,6 @@ class SystolicArray(object):
         return seq
 
     def get_nodes_by_indexes(self, rows, cols):
-        assert isinstance(rows, int) or isinstance(cols, int), \
-            "Now this function doesn't support 2D arrays"  # todo: deal with it
         rows = self.fix_sequence_of_indexes(rows)
         cols = self.fix_sequence_of_indexes(cols)
         objs = []

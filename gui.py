@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from base import SystolicArray
-from configs.example_1 import ARRAY_SIZE, KEYS, NODES_BY_CLASS, INPUT_STREAMS, CONNECTIONS
+from configs.example_1 import ARRAY_SIZE, NODES_BY_CLASS, INPUT_STREAMS, CONNECTIONS
 
 
 class Application(tk.Frame):
@@ -61,7 +61,7 @@ class Application(tk.Frame):
                 highlightthickness=1
             )
             gap = 40
-            start = (350 + (sz + gap) * (c - c0), 80 + (sz + gap) * (r - r0))
+            start = (250 + (sz + gap) * (c - c0), 30 + (sz + gap) * (r - r0))
             end = tuple(c + sz for c in start)
             frame.place(x=start[0], y=start[1], width=sz, height=sz)
             self.visible_nodes.append(frame)
@@ -72,7 +72,7 @@ class Application(tk.Frame):
 
 
 if __name__ == '__main__':
-    sa = SystolicArray(ARRAY_SIZE, KEYS, NODES_BY_CLASS, INPUT_STREAMS, CONNECTIONS)
+    sa = SystolicArray(ARRAY_SIZE, NODES_BY_CLASS, INPUT_STREAMS, CONNECTIONS)
     root = tk.Tk()
     SCREEN_SIZE = {
         'width': root.winfo_screenwidth(),
