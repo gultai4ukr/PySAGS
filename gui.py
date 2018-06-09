@@ -14,7 +14,7 @@ class Application(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        self.label_select_node = tk.Label(self, text="Select node to show")
+        self.label_select_node = tk.Label(self, text="Select node")
         self.label_select_node.place(x=20, y=20)
 
         self.label_x = tk.Label(self, text="X=")
@@ -27,7 +27,7 @@ class Application(tk.Frame):
         self.entry_y = tk.Entry(self, width=6)
         self.entry_y.place(x=40, y=60)
 
-        self.label_steps = tk.Label(self, text="Specify number of steps")
+        self.label_steps = tk.Label(self, text="Select step")
         self.label_steps.place(x=20, y=80)
 
         self.entry_steps = tk.Entry(self, width=6)
@@ -38,7 +38,9 @@ class Application(tk.Frame):
 
     def simulate(self):
         steps = self.entry_steps.get()
-        self.systolic_array.iterate(int(steps) if steps else 1)
+        self.systolic_array.reset()
+        self.systolic_array.iterate(int(steps))
+
         r = int(self.entry_x.get())
         c = int(self.entry_y.get())
         for node in self.visible_nodes:
@@ -72,12 +74,14 @@ class Application(tk.Frame):
 
 
 if __name__ == '__main__':
-    sa = SystolicArray(ARRAY_SIZE, NODES_BY_CLASS, INPUT_STREAMS, CONNECTIONS)
     root = tk.Tk()
     SCREEN_SIZE = {
         'width': root.winfo_screenwidth(),
         'height': root.winfo_screenheight()
     }
     root.geometry("{width}x{height}".format(**SCREEN_SIZE))
-    app = Application(sa, master=root, **SCREEN_SIZE)
+    app = Application(
+        SystolicArray(ARRAY_SIZE, NODES_BY_CLASS, INPUT_STREAMS, CONNECTIONS),
+        master=root, **SCREEN_SIZE
+    )
     app.mainloop()

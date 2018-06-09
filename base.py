@@ -17,6 +17,9 @@ class Connection(object):
         assert key == self.key_from
         self.data = data
 
+    def reset(self):
+        self.data = 0
+
 
 class AbstractNode(object):
 
@@ -41,11 +44,15 @@ class AbstractNode(object):
     def process(self):
         raise NotImplementedError
 
+    def reset(self):
+        self.data = OrderedDict.fromkeys(self.KEYS, 0)
+
 
 class DataStream(object):
 
     def __init__(self, data, key):
         # todo: add possibility to specify fp/path to file with data
+        self.initial_data = data
         self.queue = deque(data)
         self.key = key
         self.connection = None
@@ -55,6 +62,9 @@ class DataStream(object):
 
     def send(self):
         self.connection.receive(self.queue.popleft() if len(self.queue) else 0, self.key)
+
+    def reset(self):
+        self.queue = deque(self.initial_data)
 
 
 class SystolicArray(object):
@@ -126,3 +136,21 @@ class SystolicArray(object):
             for r in range(self.n):
                 for c in range(self.m):
                     self.array[r][c].process()
+        self.current_step += n_times
+
+    def reset(self):
+        for key, streams in self.input_streams.items():
+            if isinstance(streams, DataStream):
+                streams = [streams]
+            assert isinstance(streams, list), \
+                "Expected `list`, but got `{obj}` of `{type}` type".format(
+                    obj=streams, type=type(streams)
+                )
+            for stream in streams:
+                stream.reset()
+        for r in range(self.n):
+            for c in range(self.m):
+                self.array[r][c].reset()
+        for conn in self.connections:
+            conn.reset()
+        self.current_step = 0
