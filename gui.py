@@ -34,14 +34,14 @@ class Application(tk.Frame):
         self.button_step_backward.place(x=20, y=100, width=25, height=20)
 
         self.step = tk.IntVar()
-        self.entry_step = tk.Entry(self, width=6, textvariable=self.step)
+        self.entry_step = tk.Entry(self, width=4, textvariable=self.step)
         self.entry_step.place(x=46, y=100)
 
         self.button_step_forward = tk.Button(self, text="+1", command=self.step_forward)
-        self.button_step_forward.place(x=100, y=100, width=25, height=20)
+        self.button_step_forward.place(x=85, y=100, width=25, height=20)
 
         self.button_simulate = tk.Button(self, text="Simulate", command=self.simulate)
-        self.button_simulate.place(x=20, y=120, width=105)
+        self.button_simulate.place(x=20, y=120, width=90)
 
     def simulate(self):
         if self.step.get() < self.systolic_array.current_step:
