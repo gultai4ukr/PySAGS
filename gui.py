@@ -48,8 +48,8 @@ class Application(tk.Frame):
             self.systolic_array.reset()
         self.systolic_array.iterate(self.step.get() - self.systolic_array.current_step)
 
-        r = int(self.entry_x.get())
-        c = int(self.entry_y.get())
+        r = int(self.entry_y.get())
+        c = int(self.entry_x.get())
         for node in self.visible_nodes:
             node.destroy()
         self.visible_nodes = []
